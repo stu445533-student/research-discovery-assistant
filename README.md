@@ -23,3 +23,18 @@ anthropic==0.7.0
 hdbscan==0.8.33
 fastapi==0.104.0
 uvicorn==0.24.0
+```
+
+##Installation
+```bash
+# Clone repository
+git clone https://github.com/yourusername/research-assistant.git
+cd research-assistant
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
