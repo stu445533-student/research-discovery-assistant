@@ -2,7 +2,7 @@
 
 An AI-powered research assistant system that helps postgraduate computer science students discover promising research topics using Retrieval-Augmented Generation (RAG), semantic caching, and one-shot prompting.
 
-## 🎯 Features
+##  Features
 
 - **Real-time arXiv Integration**: Continuously fetches and indexes latest CS papers
 - **Semantic Search**: Vector-based retrieval using SPECTER embeddings
@@ -25,7 +25,9 @@ fastapi==0.104.0
 uvicorn==0.24.0
 ```
 
-##Installation
+# Quick start 
+
+## 1. installation
 ```bash
 # Clone repository
 git clone https://github.com/yourusername/research-assistant.git
@@ -37,4 +39,123 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
+## 2. configuration 
+Create .env file:
+
+```env
+ANTHROPIC_API_KEY=your_anthropic_key
+OPENAI_API_KEY=your_openai_key
+```
+## 3. Initialize System
+
+```bash
+# Create data directory
+mkdir data
+
+# Fetch initial papers
+python src/main.py update
+```
+## 4. Run API Server
+```bash
+# Start FastAPI server
+cd src/api
+python app.py
+
+```
+Visit http://localhost:8000 to access the web interface.
+
+# Usage
+
+## Command Line Interface(CLI)
+
+```bash
+# Update paper database
+python src/main.py update
+
+# Process a query
+python src/main.py query "What are emerging trends in transformer models?"
+
+# Show trending topics
+python src/main.py topics
+
+# Show system statistics
+python src/main.py stats
+
+# Run as background daemon (continuous updates)
+python src/main.py daemon
+
+```
+## API Endpoints
+POST /query - Process research query
+```json
+{
+  "query": "What are recent advances in NLP?",
+  "use_cache": true
+}
+```
+GET /topics?top_n=10 - Get trending topics
+GET /stats - Get system statistics
+POST /update - Manually trigger paper update
+GET /health - Health check
+
+## Python API
+```python
+from src.main import ResearchAssistantSystem
+
+# Initialize system
+system = ResearchAssistantSystem()
+system.load_state()
+
+# Update papers
+system.update_paper_database()
+
+# Process query
+response = system.process_query(
+    "What are emerging research areas in computer vision?"
+)
+
+print(response['answer'])
+print(f"Cost: ${response['cost']:.4f}")
+print(f"Retrieved papers: {len(response['retrieved_papers'])}")
+
+# Get trending topics
+topics = system.get_trending_topics(top_n=5)
+for topic in topics:
+    print(f"Topic: {topic['keywords'][:5]}")
+    print(f"Papers: {topic['num_papers']}")
+
+```
+# Architecture
+```
+┌─────────────────┐
+│  arXiv API      │
+│  (5-min poll)   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Data Ingestion │
+│  & Embedding    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌──────────────┐
+│  FAISS Vector   │────▶│   HDBSCAN    │
+│  Store (LRU)    │     │   Clustering │
+└────────┬────────┘     └──────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Retrieval     │
+│   Pipeline      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌──────────────┐
+│  Semantic Cache │────▶│ LLM Manager  │
+│  (Similarity)   │     │ (RAG + Shot) │
+└─────────────────┘     └──────────────┘
+
+```
 
