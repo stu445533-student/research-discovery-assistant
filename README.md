@@ -179,10 +179,10 @@ python -m pytest tests/
 
 the system track:
 
--**Retrieval Quality**: Hit Rate, nDCG@k, Recall@k.
+- **Retrieval Quality**: Hit Rate, nDCG@k, Recall@k.
 
--**Cache Efficiency**: Hit rate, latency reduction.
+- **Cache Efficiency**: Hit rate, latency reduction.
 
--**Cost Savings**: LLM API cost reduction percentage.
+- **Cost Savings**: LLM API cost reduction percentage.
 
--**Response Quality**: LLM-as-judge evaluation.
+- **Response Quality**: LLM-as-judge evaluation.
