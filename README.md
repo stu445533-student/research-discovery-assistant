@@ -159,3 +159,22 @@ for topic in topics:
 
 ```
 
+# Testing
+```bash
+# Run unit tests
+python tests/test_system.py
+
+# Run integration tests
+python tests/test_integration.py
+
+# Run all tests
+python -m pytest tests/
+
+```
+
+# Evaluation Metrics
+the system track:
+-**Retrieval Quality**: Hit Rate, nDCG@k, Recall@k.
+-**Cache Efficiency**: Hit rate, latency reduction.
+-**Cost Savings**: LLM API cost reduction percentage.
+-**Response Quality**: LLM-as-judge evaluation.
