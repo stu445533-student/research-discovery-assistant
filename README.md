@@ -186,3 +186,29 @@ the system track:
 - **Cost Savings**: LLM API cost reduction percentage.
 
 - **Response Quality**: LLM-as-judge evaluation.
+
+
+# Configuration
+Key parameters in src/main.py:
+```python
+# Vector store
+embedding_dim = 768  # SPECTER dimension
+max_store_size = 10000  # LRU limit
+
+# Topic extraction
+min_cluster_size = 5
+min_samples = 3
+
+# Retrieval
+top_k = 10
+similarity_threshold = 0.5
+
+# Caching
+cache_similarity_threshold = 0.92
+max_cache_size = 1000
+
+# Models
+flagship_model = 'claude-sonnet-4-20250514'
+low_cost_model = 'claude-haiku-4-20250514'
+
+```
