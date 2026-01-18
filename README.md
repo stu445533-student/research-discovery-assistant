@@ -95,8 +95,11 @@ POST /query - Process research query
 }
 ```
 GET /topics?top_n=10 - Get trending topics
+
 GET /stats - Get system statistics
+
 POST /update - Manually trigger paper update
+
 GET /health - Health check
 
 ## Python API
@@ -173,8 +176,13 @@ python -m pytest tests/
 ```
 
 # Evaluation Metrics
+
 the system track:
+
 -**Retrieval Quality**: Hit Rate, nDCG@k, Recall@k.
+
 -**Cache Efficiency**: Hit rate, latency reduction.
+
 -**Cost Savings**: LLM API cost reduction percentage.
+
 -**Response Quality**: LLM-as-judge evaluation.
