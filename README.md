@@ -30,7 +30,7 @@ uvicorn==0.24.0
 ## 1. installation
 ```bash
 # Clone repository
-git clone https://github.com/stu445533-student/research-assistant.git
+git clone https://github.com/stu445533-student/research-discovery-assistant.git
 cd research-assistant
 
 # Create virtual environment
