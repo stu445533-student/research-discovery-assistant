@@ -1,15 +1,17 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List, Optional
 import sys
-sys.path.append('..')
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.main import ResearchAssistantSystem
 
 app = FastAPI(title="Research Assistant API")
 
-# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,59 +24,34 @@ app.add_middleware(
 system = ResearchAssistantSystem()
 system.load_state()
 
-# Pydantic models
 class QueryRequest(BaseModel):
     query: str
     use_cache: Optional[bool] = True
-    
-class QueryResponse(BaseModel):
-    answer: str
-    model: str
-    model_type: str
-    cost: float
-    retrieved_papers: List[dict]
-    processing_time: float
-    cached: Optional[bool] = False
 
-class TopicInfo(BaseModel):
-    cluster_id: int
-    num_papers: int
-    keywords: List[str]
-    top_categories: List[tuple]
-    sample_titles: List[str]
-
-# Endpoints
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return {
-        "message": "Research Assistant API",
-        "version": "1.0.0",
-        "endpoints": ["/query", "/topics", "/stats", "/update"]
-    }
+    """Serve simple HTML interface"""
+    html_path = os.path.join(os.path.dirname(__file__), 'static', 'index.html')
+    if os.path.exists(html_path):
+        with open(html_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    return """
+    <html>
+        <body>
+            <h1>Research Assistant API</h1>
+            <p>API is running. Use POST /query to ask questions.</p>
+        </body>
+    </html>
+    """
 
-@app.post("/query", response_model=QueryResponse)
+@app.post("/query")
 async def process_query(request: QueryRequest):
     """Process a research query"""
     try:
-        response = system.process_query(
-            request.query, 
-            use_cache=request.use_cache
-        )
-        
+        response = system.process_query(request.query, use_cache=request.use_cache)
         if response.get('error'):
             raise HTTPException(status_code=500, detail=response['answer'])
-        
         return response
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/topics", response_model=List[TopicInfo])
-async def get_topics(top_n: int = 10):
-    """Get trending research topics"""
-    try:
-        topics = system.get_trending_topics(top_n=top_n)
-        return topics
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -107,4 +84,5 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import config
+    uvicorn.run(app, host=config.API_HOST, port=config.API_PORT)
