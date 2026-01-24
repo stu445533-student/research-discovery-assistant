@@ -5,24 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Research Assistant</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
+        .container { max-width: 1000px; margin: 0 auto; }
         .header {
             background: white;
             padding: 30px;
@@ -30,29 +20,13 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
-        
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: #666;
-        }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
-        
-        .query-section, .topics-section {
+        h1 { color: #667eea; margin-bottom: 10px; }
+        .query-section {
             background: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        
         textarea {
             width: 100%;
             padding: 15px;
@@ -63,12 +37,7 @@
             min-height: 100px;
             font-family: inherit;
         }
-        
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
+        textarea:focus { outline: none; border-color: #667eea; }
         button {
             background: #667eea;
             color: white;
@@ -78,18 +47,9 @@
             font-size: 16px;
             cursor: pointer;
             margin-top: 10px;
-            transition: background 0.3s;
         }
-        
-        button:hover {
-            background: #5568d3;
-        }
-        
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
+        button:hover { background: #5568d3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
         .response-box {
             margin-top: 20px;
             padding: 20px;
@@ -97,12 +57,9 @@
             border-radius: 5px;
             border-left: 4px solid #667eea;
             display: none;
+            white-space: pre-wrap;
         }
-        
-        .response-box.show {
-            display: block;
-        }
-        
+        .response-box.show { display: block; }
         .metadata {
             display: flex;
             gap: 20px;
@@ -112,77 +69,10 @@
             font-size: 14px;
             color: #666;
         }
-        
-        .paper-list {
-            margin-top: 15px;
-        }
-        
-        .paper-item {
-            padding: 10px;
-            background: white;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border-left: 3px solid #667eea;
-        }
-        
-        .paper-title {
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .paper-id {
-            font-size: 12px;
-            color: #888;
-        }
-        
-        .topic-item {
-            padding: 15px;
-            background: #f8f9fa;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        
-        .topic-header {
-            font-weight: 600;
-            color: #667eea;
-            margin-bottom: 5px;
-        }
-        
-        .keywords {
-            font-size: 14px;
-            color: #666;
-        }
-        
         .loading {
             text-align: center;
             padding: 20px;
             color: #667eea;
-        }
-        
-        .stats-bar {
-            background: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-around;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: 600;
-            color: #667eea;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
         }
     </style>
 </head>
@@ -190,44 +80,21 @@
     <div class="container">
         <div class="header">
             <h1>🔬 Smart Research Topic Discovery</h1>
-            <p class="subtitle">AI-powered research assistant for postgraduate students</p>
+            <p>AI-powered research assistant for postgraduate students</p>
         </div>
         
-        <div class="stats-bar" id="statsBar">
-            <div class="stat-item">
-                <div class="stat-value" id="papersIndexed">-</div>
-                <div class="stat-label">Papers Indexed</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="cacheHitRate">-</div>
-                <div class="stat-label">Cache Hit Rate</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="costsSaved">-</div>
-                <div class="stat-label">Costs Saved</div>
-            </div>
-        </div>
-        
-        <div class="main-content">
-            <div class="query-section">
-                <h2>Ask a Research Question</h2>
-                <textarea id="queryInput" placeholder="E.g., What are emerging trends in transformer architectures for computer vision?"></textarea>
-                <button id="submitBtn" onclick="submitQuery()">Get Insights</button>
-                
-                <div id="responseBox" class="response-box">
-                    <div id="responseText"></div>
-                    <div class="metadata">
-                        <span id="modelInfo"></span>
-                        <span id="costInfo"></span>
-                        <span id="timeInfo"></span>
-                    </div>
-                    <div id="papersList" class="paper-list"></div>
-                </div>
-            </div>
+        <div class="query-section">
+            <h2>Ask a Research Question</h2>
+            <textarea id="queryInput" placeholder="E.g., What are emerging trends in transformer architectures for computer vision?"></textarea>
+            <button id="submitBtn" onclick="submitQuery()">Get Insights</button>
             
-            <div class="topics-section">
-                <h2>Trending Topics</h2>
-                <div id="topicsList"></div>
+            <div id="responseBox" class="response-box">
+                <div id="responseText"></div>
+                <div class="metadata">
+                    <span id="modelInfo"></span>
+                    <span id="costInfo"></span>
+                    <span id="timeInfo"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -235,43 +102,6 @@
     <script>
         const API_BASE = 'http://localhost:8000';
         
-        // Load stats on page load
-        async function loadStats() {
-            try {
-                const response = await fetch(`${API_BASE}/stats`);
-                const stats = await response.json();
-                
-                document.getElementById('papersIndexed').textContent = stats.papers_indexed || 0;
-                document.getElementById('cacheHitRate').textContent = 
-                    ((stats.cache_hit_rate || 0) * 100).toFixed(1) + '%';
-                document.getElementById('costsSaved').textContent = 
-                    '$' + (stats.total_costs_saved || 0).toFixed(2);
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
-        }
-        
-        // Load trending topics
-        async function loadTopics() {
-            try {
-                const response = await fetch(`${API_BASE}/topics?top_n=5`);
-                const topics = await response.json();
-                
-                const topicsList = document.getElementById('topicsList');
-                topicsList.innerHTML = topics.map((topic, i) => `
-                    <div class="topic-item">
-                        <div class="topic-header">Topic ${i + 1} (${topic.num_papers} papers)</div>
-                        <div class="keywords">${topic.keywords.slice(0, 5).join(', ')}</div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading topics:', error);
-                document.getElementById('topicsList').innerHTML = 
-                    '<p class="loading">No topics available yet</p>';
-            }
-        }
-        
-        // Submit query
         async function submitQuery() {
             const query = document.getElementById('queryInput').value.trim();
             
@@ -290,63 +120,32 @@
             try {
                 const response = await fetch(`${API_BASE}/query`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query, use_cache: true })
                 });
                 
                 const data = await response.json();
                 
-                // Display response
-                document.getElementById('responseText').innerHTML = 
-                    data.answer.replace(/\n/g, '<br><br>');
-                document.getElementById('modelInfo').textContent = 
-                    `Model: ${data.model}`;
-                document.getElementById('costInfo').textContent = 
-                    `Cost: $${data.cost.toFixed(4)}`;
-                document.getElementById('timeInfo').textContent = 
-                    `Time: ${data.processing_time.toFixed(2)}s`;
-                
-                // Display retrieved papers
-                const papersList = document.getElementById('papersList');
-                papersList.innerHTML = '<h3>Retrieved Papers:</h3>' + 
-                    data.retrieved_papers.map(paper => `
-                        <div class="paper-item">
-                            <div class="paper-title">${paper.title}</div>
-                            <div class="paper-id">arXiv: ${paper.arxiv_id} | 
-                                Relevance: ${(paper.relevance_score * 100).toFixed(1)}%</div>
-                        </div>
-                    `).join('');
+                document.getElementById('responseText').textContent = data.answer;
+                document.getElementById('modelInfo').textContent = `Model: ${data.model}`;
+                document.getElementById('costInfo').textContent = `Cost: $${data.cost.toFixed(4)}`;
+                document.getElementById('timeInfo').textContent = `Time: ${data.processing_time.toFixed(2)}s`;
                 
                 responseBox.classList.add('show');
                 
-                // Reload stats
-                loadStats();
-                
             } catch (error) {
-                alert('Error processing query: ' + error.message);
+                alert('Error: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Get Insights';
             }
         }
         
-        // Load initial data
-        loadStats();
-        loadTopics();
-        
-        // Reload stats and topics every 30 seconds
-        setInterval(() => {
-            loadStats();
-            loadTopics();
-        }, 30000);
-        
-        // Enter key to submit
         document.getElementById('queryInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) {
                 submitQuery();
-              });
+            }
+        });
     </script>
 </body>
 </html>
