@@ -65,7 +65,7 @@ class ArxivCrawler:
         return papers
     
     def save_papers(self, papers: List[Dict], filepath=None):
-        """Save papers to JSONL file"""
+        """Save papers to JSON file"""
         if filepath is None:
             filepath = config.PAPERS_FILE
             
