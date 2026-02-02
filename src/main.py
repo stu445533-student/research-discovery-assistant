@@ -52,7 +52,9 @@ class ResearchAssistantSystem:
                 'queries_processed': 0,
                 'last_update': None
             }
-            
+                        # Automatically load existing state if available
+            self.logger.info("Attempting to load saved state...")
+            self.load_state() 
             self.logger.info("System initialized successfully")
             
         except Exception as e:
