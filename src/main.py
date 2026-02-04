@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import config
 from src.crawler.arxiv_crawler import ArxivCrawler
 from src.vectorstore.embedder import PaperEmbedder
-from src.vectorstore.vector_store import FAISSVectorStore
+from src.vectorstore.vector_store import RedisVectorStore 
 from src.retrieval.retrieval_pipeline import RetrievalPipeline
 from src.cache.semantic_cache import SemanticCache
 from src.llm.llm_manager import LLMManager
@@ -42,7 +42,7 @@ class ResearchAssistantSystem:
         try:
             self.crawler = ArxivCrawler()
             self.embedder = PaperEmbedder()
-            self.vector_store = FAISSVectorStore()
+            self.vector_store = RedisVectorStore()
             self.retrieval_pipeline = RetrievalPipeline(self.vector_store, self.embedder)
             self.semantic_cache = SemanticCache(self.embedder)
             self.llm_manager = LLMManager(self.semantic_cache)
@@ -52,9 +52,11 @@ class ResearchAssistantSystem:
                 'queries_processed': 0,
                 'last_update': None
             }
-                        # Automatically load existing state if available
+            # --- ADD THIS BLOCK ---
+            # Automatically load existing state if available
             self.logger.info("Attempting to load saved state...")
             self.load_state() 
+            # ----------------------
             self.logger.info("System initialized successfully")
             
         except Exception as e:
