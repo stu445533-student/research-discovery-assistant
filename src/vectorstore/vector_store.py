@@ -148,7 +148,16 @@ class RedisVectorStore:
             formatted_results.append((paper, similarity))
             
         return formatted_results
-
+        
+    def count(self) -> int:
+        """Return the number of papers in the Redis index"""
+        try:
+            info = self.client.ft(self.index_name).info()
+            return int(info.get('num_docs', 0))
+        except Exception:
+            return 0
+    
+    
     def save(self, filepath=None):
         pass # Redis auto-saves
 
