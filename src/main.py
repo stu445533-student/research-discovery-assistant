@@ -52,8 +52,7 @@ class ResearchAssistantSystem:
                 'queries_processed': 0,
                 'last_update': None
             }
-            # --- ADD THIS BLOCK ---
-            # Automatically load existing state if available
+            
             self.logger.info("Attempting to load saved state...")
             self.load_state() 
             # ----------------------
@@ -142,11 +141,19 @@ class ResearchAssistantSystem:
         cache_stats = self.semantic_cache.get_stats()
         cost_report = self.llm_manager.get_cost_report()
         
+        # Check if vector store has a count method (Redis) or use len (FAISS fallback)
+        if hasattr(self.vector_store, 'count'):
+            vs_size = self.vector_store.count()
+        elif hasattr(self.vector_store, 'metadata_store'):
+            vs_size = len(self.vector_store.metadata_store)
+        else:
+            vs_size = 0
+
         return {
             **self.system_stats,
             'cache_hit_rate': cache_stats['hit_rate'],
             'total_costs_saved': cost_report['total_costs_saved'],
-            'vector_store_size': len(self.vector_store.metadata_store),
+            'vector_store_size': vs_size,  # <--- FIXED
             'cached_responses': len(self.semantic_cache.cache_queries)
         }
     
@@ -168,6 +175,70 @@ class ResearchAssistantSystem:
         except Exception as e:
             self.logger.warning(f"Could not load state: {e}")
 
+    
+
+
+    def get_trending_topics(self, top_n: int = 5) -> List[Dict]:
+        """Get trending topics from indexed papers"""
+        from src.retrieval.topic_extractor import TopicExtractor
+
+        try:
+            # Get papers differently based on vector store type
+            if isinstance(self.vector_store, RedisVectorStore):
+                # For Redis: Read from papers file
+                import json
+                papers = []
+
+                if not os.path.exists(config.PAPERS_FILE):
+                    self.logger.warning("No papers file found")
+                    return []
+
+                with open(config.PAPERS_FILE, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        if line.strip():
+                            papers.append(json.loads(line))
+
+                # Take only recent papers (last 100)
+                papers = papers[-100:] if len(papers) > 100 else papers
+
+            else:
+                # For FAISS: Use metadata_store
+                papers = list(self.vector_store.metadata_store.values())
+
+            if len(papers) < 5:
+                self.logger.warning(f"Not enough papers for topic extraction: {len(papers)}")
+                return []
+
+            # Get embeddings
+            self.logger.info(f"Extracting topics from {len(papers)} papers...")
+            embeddings = self.embedder.embed_papers(papers)
+
+            # Extract topics
+            min_cluster = max(3, len(papers) // 20)
+            extractor = TopicExtractor(
+            min_cluster_size=min_cluster,
+            min_samples=2
+            )
+
+            topics = extractor.extract_topics(papers, embeddings)
+
+            if not topics:
+                self.logger.warning("No topics extracted")
+                return []
+
+            # Sort by number of papers
+            sorted_topics = sorted(
+            topics.values(),
+            key=lambda x: x['num_papers'],
+            reverse=True
+            )
+
+            self.logger.info(f"Extracted {len(sorted_topics)} topics")
+            return sorted_topics[:top_n]
+
+        except Exception as e:
+            self.logger.error(f"Error extracting topics: {e}", exc_info=True)
+            return []
 
 def main():
     """Command-line interface"""
@@ -240,6 +311,24 @@ def main():
         elif command == "load":
             system.load_state()
             print("✓ State loaded successfully\n")
+        
+        elif command == "topics":
+            topics = system.get_trending_topics(top_n=5)
+            print("\n" + "="*80)
+            print("TRENDING TOPICS")
+            print("="*80)
+            
+            if not topics:
+                print ("no topics found. update database first.")
+            
+            else:
+                for i, topic in enumerate(topics, 1):
+                    print(f"\n{i}. Topic ID: {topic['cluster_id']}")
+                    print(f"    Papers: {topic['num_papers']}")
+                    print(f"    Keywords: {', '.join(topic['keywords'][:5])}")
+                    print(f"    Categories: {', '.join([f'{cat}({count})' for cat, count in topic['top_categories']][:3])}")
+            print("\n" + "="*80 + "\n")
+
             
         else:
             print("\nUnknown command. Available commands:")
