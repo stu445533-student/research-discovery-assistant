@@ -120,6 +120,8 @@ class ResearchAssistantSystem:
             response['processing_time'] = time.time() - start_time
             
             self.system_stats['queries_processed'] += 1
+            if use_cache:
+                self.save_state()
             
             self.logger.info(f"Query processed in {response['processing_time']:.2f}s")
             
